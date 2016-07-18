@@ -1,0 +1,59 @@
+catkin_make
+	Shortcut for the cmake workflow, and works for workspaces.
+	Will build any catkin projects found in the src folder.
+	
+	CMake Workflow:
+		mkdir build
+		cd build
+		cmake ..
+		make
+		make install #optional
+	
+	Catkin Workflow:
+		catkin_make
+		catkin_make install
+		
+
+
+catkin workspaces:
+	Tutorials: http://wiki.ros.org/catkin/Tutorials/create_a_workspace
+	
+	Typical catkin workspace layout:
+	
+	workspace_folder/         -- WORKSPACE
+		src/                    -- SOURCE SPACE
+			CMakeLists.txt        -- The 'toplevel' CMake file
+			package_1/
+				CMakeLists.txt
+				package.xml
+				...
+			package_n/
+				CMakeLists.txt
+				package.xml
+				...
+	build/                  -- BUILD SPACE
+		CATKIN_IGNORE         -- Keeps catkin from walking this directory
+	devel/                  -- DEVELOPMENT SPACE (set by CATKIN_DEVEL_PREFIX)
+		bin/
+		etc/
+		include/
+		lib/
+		share/
+		.catkin
+		env.bash
+		setup.bash
+		setup.sh
+		...
+	install/                -- INSTALL SPACE (set by CMAKE_INSTALL_PREFIX)
+		bin/
+		etc/
+		include/
+		lib/
+		share/
+		.catkin             
+		env.bash
+		setup.bash
+		setup.sh
+		...
+
+	

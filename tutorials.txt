@@ -1,0 +1,240 @@
+$ rospack
+	rospack allows you to get information about packages.
+	In order to add the ROS package to your workspace, you must first:
+	$ source /opt/ros/<VERSION>/setup.bash
+	$ source /TO/PACKAGE/DIR/devel/setup.bash
+	
+	rospack find [package_name]
+		get directory of package.
+
+	rospack depends1 [package_name]
+		gives the first-level dependencies of the given package.
+
+	rospack depends [package_name]
+		recursively gives all of the dependencies of the given package.
+
+rosbash suite
+	Suite of ROS commands that help you manipulate bash.
+
+	$ roscd [locationname[/subdir]]
+		It allows you to change directory directly to a package or stack.
+		NOTE: To find where ROS stores log files, use: roscd log
+
+	$ rosls [locationname[/subdir]]
+		Allows you to ls directly in a package by name rather than by absolute path.
+
+	$ rosdep install [package_name]
+		Installs all dependencies for a package.
+
+ROS Graph
+	>> CONCEPTS
+		Nodes:
+			A node is an executable that uses ROS to communicate with other nodes.
+		Messages
+			ROS data type used when subscribing or publishing to a topic.
+		Topics
+			Nodes can publish messages to a topic as well as subscribe to a topic to receive messages.
+		Master
+			Name service for ROS (helps nodes find each other)
+		rosout
+			ROS stdout/stderr.
+			Represented as an ROS node that is always running.
+		roscore
+			Master + rosout + parameter server.
+			Should be the first command that you run when using ROS.
+	>> COMMANDS
+		roscore:
+			Starts up ROS. Should be the first command that you run.
+		
+		rosnode:
+			rosnode list
+				Lists the current nodes running.
+			rosnode info [/[NODE NAME]]
+				Lists information about the node
+			rosnode ping [/[NODE NAME]]
+				Pings the node.
+		
+		rosrun:
+			rosrun [package_name] [node_name]
+				Runs the node in the package.
+			rosrun [package_name] [node_name] __name:=[custom_name]
+				Runs the node in the package with a custom name.
+		
+		
+		rostopic:
+			Commands to keep track of ROS topics. (use rostopic -h)
+			rostopic list (-v for verbose)
+				Lists all topics.
+			rostopic type [topic]
+				Prints the type of message that the topic uses.
+			rostopic pub [topic] [msg_type] [args]
+				Publishes a message to a topic manually.
+			Add -1 to run once then stop.
+				Add -r to give repeat rate.
+				Add -- after msg_type to tell the parser that none of the following arguments are options.
+		
+		rosmsg:
+			rosmsg show [message name]
+				shows the details of the message
+
+		rosservice:
+			rosservice list
+				Lists services.
+			rosservice type [service]
+				List the type and parameters of the service.	
+			rosservice call [service] [args]
+				Calls the service.
+			rosservice find
+			rosservice uri
+			
+		rosparam:
+			set [param]
+				Set a parameter.
+			get [param]
+				Get a certain parameter.
+				use rosparam get / to get all.
+			load [filename] [namespace]
+				Load parameters from file.
+			dump [filename] [namespace]
+				Save parameters to a file.
+				eg. rosparam dump params.yaml
+			delete
+			list
+
+		roslaunch:
+			Allows launching nodes using a configuration file within a package.
+			Usage:
+			roslaunch [package_name] [launch_file]
+				Launch file: designated with <filename>.launch
+				
+			Example launch file to create a node that causes a turtle node to copy another one:
+				<launch>
+					<group ns="turtlesim1">
+						<node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+					</group>
+
+					<group ns="turtlesim2">
+						<node pkg="turtlesim" name="sim" type="turtlesim_node"/>
+					</group>
+
+					<node pkg="turtlesim" name="mimic" type="mimic">
+						<remap from="input" to="turtlesim1/turtle1"/>
+						<remap from="output" to="turtlesim2/turtle1"/>
+					</node>
+				</launch>
+
+		message files:
+			Simple text file that outlines the contents of a message.
+
+			Find details of ROS message type:
+				rosmsg show [package name/message name]
+
+			To enable these message files in a package:
+				In package.xml, make sure these two lines are uncommented:
+					<build_depend>message_generation</build_depend>
+					<run_depend>message_runtime</run_depend>
+				In CMakeLists.txt, make sure these code blocks exist:
+					find_package(catkin REQUIRED COMPONENTS
+						roscpp
+						rospy
+						std_msgs
+						message_generation # MAKE SURE THIS ONE IS HERE
+					)
+
+					CATKIN_DEPENDS message_runtime ...
+
+					add_message_files (
+						FILES
+						Num.msg
+					)
+
+					generate_messages (
+						DEPENDENCIES
+						std_msgs
+					)
+
+			Possible Data Formats:
+				int8, int16, int32, int64
+				float32, float64
+				string
+				time, duration
+				other msg files
+				variable length arrays, fixed-length arrays (C)
+				Header (timestamp and coordinate frame information)
+			Example msg file:
+				Header header
+				string child_frame_id
+				geometry_msgs/PoseWithCovariance pose
+				geometry_msgs/TwistWithCovariance twist
+
+		service files:
+			Simple text file that outlines the request and response of a service.
+			Uses the same data types as messages.
+			
+			To enable them, in addition to the message_generation functions that need to uncommented/altered:
+				add_service_files(
+					FILES
+					AddTwoInts.srv
+				)
+
+			Example service file:
+				int64 A
+				int64 B
+				---
+				int64 Sum
+
+
+		
+>> EDITING FILES
+	rosed [package] [filename]
+		Opens vim to edit the filename under that package.
+
+>> MONITORING AND LOGGING
+	
+	Logger Levels:
+		There are 5 different types of logger levels.
+		ROS prioritizes them as such:
+			1) Fatal
+			2) Error
+			3) Warn
+			4) Info
+			5) Debug
+	
+	rqtgraph:
+		Creates a dynamic graph of what's going on in the system.
+		Instantiate it by running:
+		$ rosrun rqtgraph rqtgraph
+
+	rqt_plot:
+		Creates a plot of variables in the system.
+		Instantiate it by running:
+		$ rosrun rqt_plot rqt_plot
+
+	rqt_console:
+		Creates a console that monitors logs from nodes.
+		Instantiate it by running:
+		$ rosrun rqt_console rqt_console
+		NOTE: USUALLY RUN WITH LOGGER_LEVEL
+
+	rqt_logger_level
+		Creates a window that shows nodes, loggers, and allows selection of logger levels.
+		Instantiate it by running:
+		$ rosrun rqt_logger_level rqt_logger_level
+
+	rosbag: the ability to record
+		rosbag record -a
+			Record data from all publishing topics.
+			Stores the data in a .bag file.
+		rosbag record -O subset -a
+			Record data from all publishing topics to subset.bag.
+		rosbag record <topic1> <topic2> ... <topicN>
+			Record specified topics.
+		rosbag info <bagfile>
+		rosbag play <bagfile>
+			Recreates all of the actions that was recorded.
+
+
+>> ERROR CHECKING
+	Run: 
+		$ roscd
+		$ roswtf

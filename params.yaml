@@ -1,0 +1,12 @@
+background_b: 255
+background_g: 86
+background_r: 150
+rosdistro: 'jade
+
+  '
+roslaunch:
+  uris: {host_genji_inspiron__43969: 'http://genji-inspiron:43969/'}
+rosversion: '1.11.16
+
+  '
+run_id: ec0728f0-283d-11e6-9bcd-7feca65255b3

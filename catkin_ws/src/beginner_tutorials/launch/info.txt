@@ -1,0 +1,2 @@
+This directory doesn't actually have to be called launch.
+Good pracfice though.
